@@ -323,12 +323,14 @@ ol li {
 
 <script>
 import { findStatusGroup } from "../pages/index";
+import Request from "./collections/request";
 
 const updateOnLocalStorage = (propertyName, property) =>
   window.localStorage.setItem(propertyName, JSON.stringify(property));
 
 export default {
   components: {
+    Request,
     "pw-section": () => import("./section"),
     VirtualList: () => import("vue-virtual-scroll-list")
   },

@@ -1,7 +1,8 @@
 <template>
   <div class="page">
     <div class="content">
-      <div class="page-columns inner-left">
+      <request></request>
+      <div class="page-columns inner-left request-section">
         <pw-section
           v-if="showPreRequestScript"
           class="orange"
@@ -791,6 +792,7 @@ import parseCurlCommand from "../assets/js/curlparser.js";
 import getEnvironmentVariablesFromScript from "../functions/preRequest";
 import parseTemplateString from "../functions/templating";
 import AceEditor from "../components/ace-editor";
+import Request from "../components/collections/request";
 
 const statusCategories = [
   {
@@ -848,10 +850,12 @@ export default {
   },
 
   components: {
+    Request,
     "pw-section": section,
     "pw-toggle": () => import("../components/toggle"),
     "pw-modal": () => import("../components/modal"),
     history: () => import("../components/history"),
+    request: () => import("../components/request"),
     autocomplete: () => import("../components/autocomplete"),
     collections: () => import("../components/collections"),
     saveRequestAs: () => import("../components/collections/saveRequestAs"),

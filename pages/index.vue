@@ -1299,33 +1299,7 @@ export default {
       }
     }
   },
-  mounted() {
-    this.observeRequestButton();
-    this._keyListener = function(e) {
-      if (e.key === "g" && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-        this.sendRequest();
-      } else if (e.key === "s" && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-        this.saveRequest();
-      } else if (e.key === "k" && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-        this.copyRequest();
-      } else if (e.key === "l" && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-        this.$refs.clearAll.click();
-      }
-    };
-    document.addEventListener("keydown", this._keyListener.bind(this));
-  },
   created() {
-    this.urlExcludes = this.$store.state.postwoman.settings.URL_EXCLUDES || {
-      // Exclude authentication by default for security reasons.
-      auth: true,
-      httpUser: true,
-      httpPassword: true,
-      bearerToken: true
-    };
 
     if (Object.keys(this.$route.query).length)
       this.setRouteQueries(this.$route.query);

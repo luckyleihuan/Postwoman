@@ -961,6 +961,10 @@ export default {
         icon: "delete"
       });
     },
+    hideRequestModal() {
+      this.showRequestModal = false;
+      this.editRequest = {};
+    },
     formatRawParams(event) {
       if (event.which !== 13 && event.which !== 9) {
         return;

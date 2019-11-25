@@ -1424,15 +1424,6 @@ export default {
     async receiveRequest(requestSection) {
       this.$toast.clear();
       requestSection.scrollInto("response");
-
-      //FIXME: Validate url in the request section, then call sendRequset here (via props
-      // if (!this.isValidURL) {
-      //   this.$toast.error("URL is not formatted properly", {
-      //     icon: "error"
-      //   });
-      //   return;
-      // }
-
       // Start showing the loading bar as soon as possible.
       // The nuxt axios module will hide it when the request is made.
       this.$nuxt.$loading.start();

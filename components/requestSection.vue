@@ -1302,6 +1302,12 @@
           : response;
       },
       sendRequest() {
+        if (!this.isValidURL) {
+          this.$toast.error("URL is not formatted properly", {
+            icon: "error"
+          });
+          return;
+        }
         this.receiveRequest(this)
       },
       getQueryStringFromPath() {

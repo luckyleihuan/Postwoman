@@ -737,7 +737,7 @@
       saveRequestAs: () => import("./collections/saveRequestAs"),
       ResponseBody: AceEditor
     },
-    props: ["historyComponent", "receiveRequest"],
+    props: ["historyComponent", "receiveRequest", "store"],
     data() {
       return {
         showModal: false,

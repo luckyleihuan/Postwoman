@@ -737,7 +737,7 @@
       saveRequestAs: () => import("./collections/saveRequestAs"),
       ResponseBody: AceEditor
     },
-    props: ["historyComponent"],
+    props: ["historyComponent", "receiveRequest"],
     data() {
       return {
         showModal: false,
@@ -1301,158 +1301,8 @@
           ? response.data
           : response;
       },
-      async sendRequest() {
-        this.$toast.clear();
-        this.scrollInto("response");
-
-        if (!this.isValidURL) {
-          this.$toast.error("URL is not formatted properly", {
-            icon: "error"
-          });
-          return;
-        }
-
-        // Start showing the loading bar as soon as possible.
-        // The nuxt axios module will hide it when the request is made.
-        this.$nuxt.$loading.start();
-
-        if (this.$refs.response.$el.classList.contains("hidden")) {
-          this.$refs.response.$el.classList.toggle("hidden");
-        }
-        this.previewEnabled = false;
-        this.response.status = "Fetching...";
-        this.response.body = "Loading...";
-
-        const auth =
-          this.auth === "Basic"
-            ? {
-              username: this.httpUser,
-              password: this.httpPassword
-            }
-            : null;
-
-        let headers = {};
-        let headersObject = {};
-
-        Object.keys(headers).forEach(id => {
-          headersObject[headers[id].key] = headers[id].value;
-        });
-        headers = headersObject;
-
-        // If the request has a body, we want to ensure Content-Length and
-        // Content-Type are sent.
-        let requestBody;
-        if (this.hasRequestBody) {
-          requestBody = this.rawInput ? this.rawParams : this.rawRequestBody;
-
-          Object.assign(headers, {
-            //'Content-Length': requestBody.length,
-            "Content-Type": `${this.contentType}; charset=utf-8`
-          });
-        }
-
-        // If the request uses a token for auth, we want to make sure it's sent here.
-        if (this.auth === "Bearer Token")
-          headers["Authorization"] = `Bearer ${this.bearerToken}`;
-
-        headers = Object.assign(
-          // Clone the app headers object first, we don't want to
-          // mutate it with the request headers added by default.
-          Object.assign({}, this.headers),
-
-          // We make our temporary headers object the source so
-          // that you can override the added headers if you
-          // specify them.
-          headers
-        );
-
-        Object.keys(headers).forEach(id => {
-          headersObject[headers[id].key] = headers[id].value;
-        });
-        headers = headersObject;
-
-        try {
-          const startTime = Date.now();
-
-          const payload = await this.makeRequest(
-            auth,
-            headers,
-            requestBody,
-            this.showPreRequestScript && this.preRequestScript
-          );
-
-          const duration = Date.now() - startTime;
-          this.$toast.info(`Finished in ${duration}ms`, {
-            icon: "done"
-          });
-
-          (() => {
-            const status = (this.response.status = payload.status);
-            const headers = (this.response.headers = payload.headers);
-
-            // We don't need to bother parsing JSON, axios already handles it for us!
-            const body = (this.response.body = payload.data);
-
-            const date = new Date().toLocaleDateString();
-            const time = new Date().toLocaleTimeString();
-
-            // Addition of an entry to the history component.
-            const entry = {
-              label: this.requestName,
-              status,
-              date,
-              time,
-              method: this.method,
-              url: this.url,
-              path: this.path,
-              usesScripts: Boolean(this.preRequestScript),
-              preRequestScript: this.preRequestScript,
-              duration,
-              star: false
-            };
-            this.historyComponent.addEntry(entry);
-          })();
-        } catch (error) {
-          console.error(error);
-          if (error.response) {
-            this.response.headers = error.response.headers;
-            this.response.status = error.response.status;
-            this.response.body = error.response.data;
-
-            // Addition of an entry to the history component.
-            const entry = {
-              label: this.requestName,
-              status: this.response.status,
-              date: new Date().toLocaleDateString(),
-              time: new Date().toLocaleTimeString(),
-              method: this.method,
-              url: this.url,
-              path: this.path,
-              usesScripts: Boolean(this.preRequestScript),
-              preRequestScript: this.preRequestScript
-            };
-            this.historyComponent.addEntry(entry);
-            return;
-          } else {
-            this.response.status = error.message;
-            this.response.body = error + ". Check console for details.";
-            this.$toast.error(error + " (F12 for details)", {
-              icon: "error"
-            });
-            if (!this.$store.state.postwoman.settings.PROXY_ENABLED) {
-              this.$toast.info("Try enabling Proxy", {
-                icon: "help",
-                duration: 8000,
-                action: {
-                  text: "Settings",
-                  onClick: (e, toastObject) => {
-                    this.$router.push({ path: "/settings" });
-                  }
-                }
-              });
-            }
-          }
-        }
+      sendRequest() {
+        this.receiveRequest(this)
       },
       getQueryStringFromPath() {
         let queryString,
@@ -1842,7 +1692,6 @@
       }
     },
     mounted() {
-      console.log('hello! ', this.historyComponent);
       this._keyListener = function(e) {
         if (e.key === "g" && (e.ctrlKey || e.metaKey)) {
           e.preventDefault();

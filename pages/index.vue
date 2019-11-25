@@ -1,7 +1,9 @@
 <template>
   <div class="page">
     <div class="content" ref="request">
-      <request-section :historyComponent="this.$refs.historyComponent"></request-section>
+      <request-section
+        :historyComponent="this.$refs.historyComponent"
+        :receiveRequest="this.receiveRequest"></request-section>
 <!--      <div class="page-columns inner-left request-section">-->
 <!--        <pw-section-->
 <!--          v-if="showPreRequestScript"-->
@@ -1351,11 +1353,6 @@ export default {
     }
   },
   methods: {
-    scrollInto(view) {
-      this.$refs[view].$el.scrollIntoView({
-        behavior: "smooth"
-      });
-    },
     handleUseHistory({
       label,
       method,
@@ -1370,7 +1367,7 @@ export default {
       this.path = path;
       this.showPreRequestScript = usesScripts;
       this.preRequestScript = preRequestScript;
-      this.scrollInto("request");
+      // requestSection.scrollInto("request");
     },
     getVariablesFromPreRequestScript() {
       if (!this.preRequestScript) {
@@ -1424,33 +1421,34 @@ export default {
         ? response.data
         : response;
     },
-    async sendRequest() {
+    async receiveRequest(requestSection) {
       this.$toast.clear();
-      this.scrollInto("response");
+      requestSection.scrollInto("response");
 
-      if (!this.isValidURL) {
-        this.$toast.error("URL is not formatted properly", {
-          icon: "error"
-        });
-        return;
-      }
+      //FIXME: Validate url in the request section, then call sendRequset here (via props
+      // if (!this.isValidURL) {
+      //   this.$toast.error("URL is not formatted properly", {
+      //     icon: "error"
+      //   });
+      //   return;
+      // }
 
       // Start showing the loading bar as soon as possible.
       // The nuxt axios module will hide it when the request is made.
       this.$nuxt.$loading.start();
 
-      if (this.$refs.response.$el.classList.contains("hidden")) {
-        this.$refs.response.$el.classList.toggle("hidden");
+      if (requestSection.$refs.response.$el.classList.contains("hidden")) {
+        requestSection.$refs.response.$el.classList.toggle("hidden");
       }
-      this.previewEnabled = false;
-      this.response.status = "Fetching...";
-      this.response.body = "Loading...";
+      requestSection.previewEnabled = false;
+      requestSection.response.status = "Fetching...";
+      requestSection.response.body = "Loading...";
 
       const auth =
-        this.auth === "Basic"
+        requestSection.auth === "Basic"
           ? {
-              username: this.httpUser,
-              password: this.httpPassword
+              username: requestSection.httpUser,
+              password: requestSection.httpPassword
             }
           : null;
 
@@ -1465,23 +1463,23 @@ export default {
       // If the request has a body, we want to ensure Content-Length and
       // Content-Type are sent.
       let requestBody;
-      if (this.hasRequestBody) {
-        requestBody = this.rawInput ? this.rawParams : this.rawRequestBody;
+      if (requestSection.hasRequestBody) {
+        requestBody = requestSection.rawInput ? requestSection.rawParams : requestSection.rawRequestBody;
 
         Object.assign(headers, {
           //'Content-Length': requestBody.length,
-          "Content-Type": `${this.contentType}; charset=utf-8`
+          "Content-Type": `${requestSection.contentType}; charset=utf-8`
         });
       }
 
       // If the request uses a token for auth, we want to make sure it's sent here.
-      if (this.auth === "Bearer Token")
-        headers["Authorization"] = `Bearer ${this.bearerToken}`;
+      if (requestSection.auth === "Bearer Token")
+        headers["Authorization"] = `Bearer ${requestSection.bearerToken}`;
 
       headers = Object.assign(
         // Clone the app headers object first, we don't want to
         // mutate it with the request headers added by default.
-        Object.assign({}, this.headers),
+        Object.assign({}, requestSection.headers),
 
         // We make our temporary headers object the source so
         // that you can override the added headers if you
@@ -1510,26 +1508,26 @@ export default {
         });
 
         (() => {
-          const status = (this.response.status = payload.status);
-          const headers = (this.response.headers = payload.headers);
+          const status = (requestSection.response.status = payload.status);
+          const headers = (requestSection.response.headers = payload.headers);
 
           // We don't need to bother parsing JSON, axios already handles it for us!
-          const body = (this.response.body = payload.data);
+          const body = (requestSection.response.body = payload.data);
 
           const date = new Date().toLocaleDateString();
           const time = new Date().toLocaleTimeString();
 
           // Addition of an entry to the history component.
           const entry = {
-            label: this.requestName,
+            label: requestSection.requestName,
             status,
             date,
             time,
-            method: this.method,
-            url: this.url,
-            path: this.path,
-            usesScripts: Boolean(this.preRequestScript),
-            preRequestScript: this.preRequestScript,
+            method: requestSection.method,
+            url: requestSection.url,
+            path: requestSection.path,
+            usesScripts: Boolean(requestSection.preRequestScript),
+            preRequestScript: requestSection.preRequestScript,
             duration,
             star: false
           };
@@ -1538,21 +1536,21 @@ export default {
       } catch (error) {
         console.error(error);
         if (error.response) {
-          this.response.headers = error.response.headers;
-          this.response.status = error.response.status;
-          this.response.body = error.response.data;
+          requestSection.response.headers = error.response.headers;
+          requestSection.response.status = error.response.status;
+          requestSection.response.body = error.response.data;
 
           // Addition of an entry to the history component.
           const entry = {
-            label: this.requestName,
-            status: this.response.status,
+            label: requestSection.requestName,
+            status: requestSection.response.status,
             date: new Date().toLocaleDateString(),
             time: new Date().toLocaleTimeString(),
-            method: this.method,
-            url: this.url,
-            path: this.path,
-            usesScripts: Boolean(this.preRequestScript),
-            preRequestScript: this.preRequestScript
+            method: requestSection.method,
+            url: requestSection.url,
+            path: requestSection.path,
+            usesScripts: Boolean(requestSection.preRequestScript),
+            preRequestScript: requestSection.preRequestScript
           };
           this.$refs.historyComponent.addEntry(entry);
           return;

@@ -92,7 +92,7 @@ ul li {
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Collection, Folder } from "./types";
+import { Collection, CollectionFolder as Folder } from "~/store/postwoman";
 
 export default Vue.extend({
   components: {

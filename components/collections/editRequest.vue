@@ -71,7 +71,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Folder, Request } from "./types";
+import { CollectionFolder as Folder, CollectionRequest as Request } from "~/store/postwoman";
 
 interface RequestUpdateData {
   name?: string;

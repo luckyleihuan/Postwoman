@@ -43,7 +43,7 @@ ul li {
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { Request } from "./types";
+import { CollectionRequest as Request } from "~/store/postwoman";
 
 export default Vue.extend({
   props: {

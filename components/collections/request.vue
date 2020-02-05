@@ -42,11 +42,12 @@ ul li {
 </style>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
+import { CollectionRequest as Request } from "~/store/postwoman";
 
 export default Vue.extend({
   props: {
-    request: Object,
+    request: Object as PropType<Request>,
     collectionIndex: Number,
     folderIndex: Number,
     requestIndex: Number

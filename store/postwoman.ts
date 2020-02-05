@@ -1,4 +1,5 @@
 import Vue from "vue";
+import { RequestState } from "./state";
 
 export const SETTINGS_KEYS = [
   /**
@@ -59,16 +60,25 @@ export const SETTINGS_KEYS = [
   "URL_EXCLUDES"
 ];
 
+export interface CollectionRequest extends RequestState {
+  name: string;
+}
+
+export interface CollectionFolder {
+  name: string;
+  requests: CollectionRequest[];
+}
+
 export interface Collection {
     name: string;
-    folders: any[]; 
-    requests: any[];
+    folders: CollectionFolder[]; 
+    requests: CollectionRequest[];
 }
 export interface CollectionState {
   settings: any;
   collections: Collection[];
-  selectedRequest: any;
-  editingRequest: any;
+  selectedRequest: RequestState | {};
+  editingRequest: RequestState | {};
 }
 
 export const state = () => (<CollectionState>{
